@@ -1,0 +1,40 @@
+name: CI Flow
+
+on:
+    push:
+        branches:
+        - main
+    pull_request:
+        branches:
+        - main
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./web
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v2
+        
+          - name: Install dependencies
+            run: npm install
+
+          - name: Run tests
+            run: npm test
+    lint:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v2
+        
+          - name: Install dependencies
+            run: npm install
+
+          - name: Run linter
+            run: npx standard -v
+    
+
