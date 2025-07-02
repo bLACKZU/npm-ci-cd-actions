@@ -12,8 +12,6 @@ router.get('/ice-flakes', function (req, res, next) {
     resource: 'ice-flakes',
     count: 205,
     shape: 'circle'
-  });
-});
-
-
+  })
+})
 module.exports = router
