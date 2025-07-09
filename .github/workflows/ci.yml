@@ -1,7 +1,6 @@
 name: CI Flow
 
 on:
-    
     pull_request:
         branches:
         - main
