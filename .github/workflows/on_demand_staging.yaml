@@ -1,0 +1,35 @@
+name: On-Demand Staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      PR_number:
+        description: 'Pull request number'
+        required: true
+
+jobs:
+  create:
+    name: Create Staging Environment and Deploy
+    defaults:
+      run:
+        shell: bash
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Verify PR Number
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        result-encoding: string
+        script: |
+            const response = await github.rest.pulls.get({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: ${{ inputs.PR_number }},
+            });
+            if (response.data.number !== ${{ inputs.PR_number }}) {
+              throw new Error('Pull request is not open or number is not valid!');
+            } else {
+              console.log("PR ref: " + response.data.head.ref);
+              return response.data.head.ref;
+            }
