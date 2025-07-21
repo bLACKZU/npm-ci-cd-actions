@@ -33,3 +33,16 @@ jobs:
               console.log("PR ref: " + response.data.head.ref);
               return response.data.head.ref;
             }
+
+    - name: Checkout infra Code
+      uses: actions/checkout@v4
+      with:
+        repository: bLACKZU/npm-infra
+        path: npm-infra
+    
+    - name: List files
+      run: |
+        echo "Files in parent directory:"
+        ls -l
+        echo "Files in npm-infra directory:" 
+        ls -l npm-infra
