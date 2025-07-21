@@ -57,6 +57,8 @@ jobs:
       id: create_stage_resource_file
       run: |
         current=$(pwd)
-        OUTPUT="$($current/npm-infra/staging/create_stage_resource_file.sh PR_${{ inputs.PR_number }} | jq -r .terraform_expected_output)"
+        echo $current
+        ls -l
+        # OUTPUT="$($current/npm-infra/staging/create_stage_resource_file.sh PR_${{ inputs.PR_number }} | jq -r .terraform_expected_output)"
         echo "::set-output name=STAGING_RESOURCE_NAME::$OUTPUT"
         
