@@ -68,6 +68,12 @@ jobs:
         terraform init
         terraform validate -no-color
 
+    - name: Configure AWS Credentials for China region audience
+      uses: aws-actions/configure-aws-credentials@v4.1.0
+      with:
+        aws-region: us-east-1
+        role-to-assume: ${{ secrets.AWS_STAGING_ROLE_ARN }}
+        
     - name: Terraform Plan
       id: plan
       working-directory: ${{ github.workspace }}/npm-infra/staging
