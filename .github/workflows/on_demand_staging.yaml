@@ -6,7 +6,9 @@ on:
       PR_number:
         description: 'Pull request number'
         required: true
-
+permissions:
+  id-token: write
+  contents: read
 jobs:
   create:
     name: Create Staging Environment and Deploy
@@ -73,7 +75,7 @@ jobs:
       with:
         aws-region: us-east-1
         role-to-assume: ${{ secrets.AWS_STAGING_ROLE_ARN }}
-        
+
     - name: Terraform Plan
       id: plan
       working-directory: ${{ github.workspace }}/npm-infra/staging
