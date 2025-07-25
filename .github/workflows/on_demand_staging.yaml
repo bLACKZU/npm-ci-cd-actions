@@ -71,7 +71,7 @@ jobs:
         terraform init
         terraform validate -no-color
 
-    - name: Configure AWS Credentials for China region audience
+    - name: Configure AWS Credentials 
       uses: aws-actions/configure-aws-credentials@v4.1.0
       with:
         aws-region: us-east-1
