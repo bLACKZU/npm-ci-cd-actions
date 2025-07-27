@@ -127,14 +127,27 @@ jobs:
       run: | 
         terraform output -raw -no-color ${{ steps.create_stage_resource_file.outputs.STAGING_RESOURCE_NAME }}
       
-    - name: Commit terraform resource files
-      working-directory: ${{ github.workspace }}/npm-infra/staging
+    # - name: Commit terraform resource files
+    #   working-directory: ${{ github.workspace }}/npm-infra/staging
+    #   run: |
+    #     git config --global user.name "bLACKZU"
+    #     git config --global user.email "satyakighosh65@gmail.com"
+    #     git remote set-url origin https://x-access-token:${{ secrets.NPM_INFRA_TOKEN }}@github.com/bLACKZU/npm-infra.git
+    #     git add ./*.tf
+    #     git commit -m "Add terraform resource files" && \
+    #       git push || echo "Nothing to commit"
+
+    - name: Setup Git Identity and Auth
+      uses: actions/setup-git@v1
+      with:
+        user-name: "bLACKZU"
+        user-email: "satyakighosh65@gmail.com"
+        token: ${{ secrets.NPM_INFRA_TOKEN }}
+
+    - name: Commit and Push
+      working-directory: npm-infra/staging
       run: |
-        git config --global user.name "bLACKZU"
-        git config --global user.email "satyakighosh65@gmail.com"
-        git remote set-url origin https://x-access-token:${{ secrets.NPM_INFRA_TOKEN }}@github.com/bLACKZU/npm-infra.git
         git add ./*.tf
         git commit -m "Add terraform resource files" && \
           git push || echo "Nothing to commit"
-
     
