@@ -10,7 +10,7 @@ permissions:
   id-token: write
   contents: write
   pull-requests: write
-  
+
 jobs:
   create:
     name: Create Staging Environment and Deploy
@@ -43,6 +43,7 @@ jobs:
       with:
         repository: bLACKZU/npm-infra
         path: npm-infra
+        token: ${{ secrets.NPM_INFRA_TOKEN }}
     
     - name: List files
       run: |
