@@ -132,12 +132,19 @@ jobs:
     - name: Commit terraform resource files
       working-directory: ${{ github.workspace }}/npm-infra/staging
       run: |
-        git config --global user.name "bLACKZU"
-        git config --global user.email "satyakighosh65@gmail.com"
-        git remote set-url origin https://x-access-token:${{ secrets.NPM_INFRA_TOKEN }}@github.com/bLACKZU/npm-infra.git
+        git config --global user.name '${{ github.actor }}'
+        git config --global user.email '${{ github.actor}}@users.noreply.github.com'
+        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
         git add ./*.tf
         git commit -m "Add terraform resource files" && \
           git push || echo "Nothing to commit"
+        
+        # git config --global user.name "bLACKZU"
+        # git config --global user.email "satyakighosh65@gmail.com"
+        # git remote set-url origin https://x-access-token:${{ secrets.NPM_INFRA_TOKEN }}@github.com/bLACKZU/npm-infra.git
+        # git add ./*.tf
+        # git commit -m "Add terraform resource files" && \
+        #   git push || echo "Nothing to commit"
 
   
     
