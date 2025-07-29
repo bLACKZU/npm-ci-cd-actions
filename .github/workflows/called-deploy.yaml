@@ -19,16 +19,13 @@ on:
           description: 'Remote host address'
           required: true
           type: string
-        staging_resource_name:
-          description: 'Staging endpoint resource name'
+        remote_user:
+          description: 'Remote user for SSH'
           required: true
           type: string
     secrets:
         SSH_PRIVATE_KEY:
           description: 'SSH private key for remote server'
-          required: true
-        REMOTE_USER:
-          description: 'Remote user for SSH connection'
           required: true
                
 jobs:
@@ -53,10 +50,10 @@ jobs:
       - name: Execute SSH commmands on remote server
         uses: JimCronqvist/action-ssh@7737f1192ddd8376686e9d6354dea44592c942bf
         with:
-          hosts: '${{ secrets.REMOTE_USER }}@${{ inputs.remote_host }}'
+          hosts: '${{ inputs.remote_user }}@${{ inputs.remote_host }}'
           privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
           command: |
-            cd /var/app/web
+            cd ${{ inputs.remote_path }}
             npm ci
             pm2 start /var/app/web/bin/www || pm2 restart /var/app/web/bin/www
             sudo service nginx restart
@@ -69,7 +66,7 @@ jobs:
             const output = `#### Staging server created
             > PR #${{ github.event.inputs.PR_number }} has been deployed successfully
 
-            URL: http://${{ inputs.staging_resource_name }}`;
+            URL: http://${{ inputs.remote_host }}`;
 
             github.rest.issues.createComment({
               issue_number: ${{ github.event.inputs.PR_number }},

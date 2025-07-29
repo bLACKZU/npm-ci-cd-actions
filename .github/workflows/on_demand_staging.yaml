@@ -38,7 +38,6 @@ jobs:
             pull_number: ${{ inputs.PR_number }},
             });
             const pr_ref = response.data.head.ref
-            console.log(response.number);
             if (response.data.number !== ${{ inputs.PR_number }}) {
               throw new Error('Pull request is not open or number is not valid!');
             } else {
@@ -156,8 +155,16 @@ jobs:
         # git commit -m "Add terraform resource files" && \
         #   git push || echo "Nothing to commit"
 
-
-
+  deploy-staging:
+    needs: create
+    uses: bLACKZU/npm-ci-cd-actions/.github/workflows/called-deploy.yaml@main
+    with:
+      PR_number: ${{ needs.create.outputs.PR_REF }}
+      src_path: ./web
+      remote_path: /var/app/web
+      remote_host: ${{ needs.create.outputs.TF_APPLY_OUTPUT }}
+      remote_user: ubuntu
+    secrets:
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
   
-    
