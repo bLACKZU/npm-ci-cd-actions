@@ -18,10 +18,16 @@ jobs:
       run:
         shell: bash
     runs-on: ubuntu-latest
-    
+    outputs:
+      STAGING_RESOURCE_NAME: ${{ steps.create_stage_resource_file.outputs.STAGING_RESOURCE_NAME }}
+      TF_APPLY_OUTPUT: ${{ steps.apply.outputs.TF_APPLY_OUTPUT }}
+      PR_REF: ${{ steps.verify_pr.outputs.PR_REF }}
+
+
     steps:
     - name: Verify PR Number
       uses: actions/github-script@v6
+      id: verify_pr
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         result-encoding: string
@@ -31,11 +37,14 @@ jobs:
             repo: context.repo.repo,
             pull_number: ${{ inputs.PR_number }},
             });
+            const pr_ref = response.data.head.ref
+            console.log(response.data);
             if (response.data.number !== ${{ inputs.PR_number }}) {
               throw new Error('Pull request is not open or number is not valid!');
             } else {
-              console.log("PR ref: " + response.data.head.ref);
-              return response.data.head.ref;
+              console.log("PR ref: " + pr_ref);
+              core.setOutput("PR_REF", pr_ref);
+              return pr_ref;
             }
     
     - name: Checkout infra Code
@@ -127,7 +136,8 @@ jobs:
       id: apply_output  
       working-directory: ${{ github.workspace }}/npm-infra/staging
       run: | 
-        terraform output -raw -no-color ${{ steps.create_stage_resource_file.outputs.STAGING_RESOURCE_NAME }}
+        OUTPUT=$(terraform output -raw -no-color ${{ steps.create_stage_resource_file.outputs.STAGING_RESOURCE_NAME }})
+        echo "TF_APPLY_OUTPUT=$OUTPUT" >> $GITHUB_OUTPUT
       
     - name: Commit terraform resource files
       working-directory: ${{ github.workspace }}/npm-infra/staging
@@ -145,6 +155,9 @@ jobs:
         # git add ./*.tf
         # git commit -m "Add terraform resource files" && \
         #   git push || echo "Nothing to commit"
+
+
+
 
   
     

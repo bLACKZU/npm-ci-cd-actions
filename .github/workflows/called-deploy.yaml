@@ -1,35 +1,35 @@
 name: Reusable NPM Deployment Workflow
 
 on:
-    workflow_call:
-        inputs:
-            PR_number:
-                description: 'Pull request number'
-                required: true
-                type: string
-            src_path:
-                description: 'Source path to deploy'
-                required: true
-                type: string
-            remote_path:
-                description: 'Remote path on the server'
-                required: true
-                type: string
-            remote_host:
-                description: 'Remote host address'
-                required: true
-                type: string
-            staging_resource_name:
-                description: 'Staging endpoint resource name'
-                required: true
-                type: string
-        secrets:
-            SSH_PRIVATE_KEY:
-                description: 'SSH private key for remote server'
-                required: true
-            REMOTE_USER:
-                description: 'Remote user for SSH connection'
-                required: true
+  workflow_call:
+    inputs:
+        PR_number:
+          description: 'Pull request number'
+          required: true
+          type: string
+        src_path:
+          description: 'Source path to deploy'
+          required: true
+          type: string
+        remote_path:
+          description: 'Remote path on the server'
+          required: true
+          type: string
+        remote_host:
+          description: 'Remote host address'
+          required: true
+          type: string
+        staging_resource_name:
+          description: 'Staging endpoint resource name'
+          required: true
+          type: string
+    secrets:
+        SSH_PRIVATE_KEY:
+          description: 'SSH private key for remote server'
+          required: true
+        REMOTE_USER:
+          description: 'Remote user for SSH connection'
+          required: true
                
 jobs:
   deploy:
