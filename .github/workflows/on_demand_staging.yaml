@@ -38,7 +38,7 @@ jobs:
             pull_number: ${{ inputs.PR_number }},
             });
             const pr_ref = response.data.head.ref
-            console.log(response.data);
+            console.log(response.number);
             if (response.data.number !== ${{ inputs.PR_number }}) {
               throw new Error('Pull request is not open or number is not valid!');
             } else {
