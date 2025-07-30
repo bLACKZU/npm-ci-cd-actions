@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       STAGING_RESOURCE_NAME: ${{ steps.create_stage_resource_file.outputs.STAGING_RESOURCE_NAME }}
-      TF_APPLY_OUTPUT: ${{ steps.apply.outputs.TF_APPLY_OUTPUT }}
+      TF_APPLY_OUTPUT: ${{ steps.apply_output.outputs.TF_APPLY_OUTPUT }}
       PR_REF: ${{ steps.verify_pr.outputs.PR_REF }}
 
 
