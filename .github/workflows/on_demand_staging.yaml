@@ -69,118 +69,119 @@ jobs:
     - name: Create stage environment resource file
       id: create_stage_resource_file
       run: |
+        jq --version
         current=$(pwd)
         chmod +x $current/npm-infra/staging/create_staging_resource.sh
-        OUTPUT="$($current/npm-infra/staging/create_staging_resource.sh PR_${{ inputs.PR_number }} | jq -r .terraform_expected_output)"
-        echo $OUTPUT
-        echo "STAGING_RESOURCE_NAME=$OUTPUT" >> $GITHUB_OUTPUT
+        $current/npm-infra/staging/create_staging_resource.sh PR_${{ inputs.PR_number }} 
+         $current/npm-infra/staging/create_staging_resource.sh PR_${{ inputs.PR_number }} | jq
+        # echo "STAGING_RESOURCE_NAME=$OUTPUT" >> $GITHUB_OUTPUT
 
-    - name: Terraform Init & Validate
-      id: init
-      working-directory: ${{ github.workspace }}/npm-infra/staging
-      run: |
-        terraform init
-        terraform validate -no-color
+  #   - name: Terraform Init & Validate
+  #     id: init
+  #     working-directory: ${{ github.workspace }}/npm-infra/staging
+  #     run: |
+  #       terraform init
+  #       terraform validate -no-color
 
-    - name: Configure AWS Credentials 
-      uses: aws-actions/configure-aws-credentials@v4.1.0
-      with:
-        aws-region: us-east-1
-        role-to-assume: ${{ secrets.AWS_STAGING_ROLE_ARN }}
+  #   - name: Configure AWS Credentials 
+  #     uses: aws-actions/configure-aws-credentials@v4.1.0
+  #     with:
+  #       aws-region: us-east-1
+  #       role-to-assume: ${{ secrets.AWS_STAGING_ROLE_ARN }}
 
-    - name: Terraform Plan
-      id: plan
-      working-directory: ${{ github.workspace }}/npm-infra/staging
-      run: |
-        terraform plan --var-file=terraform.tfvars.auto.example -no-color
-      continue-on-error: true
+  #   - name: Terraform Plan
+  #     id: plan
+  #     working-directory: ${{ github.workspace }}/npm-infra/staging
+  #     run: |
+  #       terraform plan --var-file=terraform.tfvars.auto.example -no-color
+  #     continue-on-error: true
     
-    - name: Update Pull Request
-      uses: actions/github-script@v7
-      env:
-        PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const output = `#### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-          #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+  #   - name: Update Pull Request
+  #     uses: actions/github-script@v7
+  #     env:
+  #       PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+  #     with:
+  #       github-token: ${{ secrets.GITHUB_TOKEN }}
+  #       script: |
+  #         const output = `#### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+  #         #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
 
-          <details><summary>Show Plan</summary>
+  #         <details><summary>Show Plan</summary>
 
-          \`\`\`\n
-          ${process.env.PLAN}
-          \`\`\`
+  #         \`\`\`\n
+  #         ${process.env.PLAN}
+  #         \`\`\`
 
-          </details>
+  #         </details>
 
-          *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+  #         *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
 
-          github.rest.issues.createComment({
-            issue_number: ${{ github.event.inputs.PR_number }},
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: output
-          })
+  #         github.rest.issues.createComment({
+  #           issue_number: ${{ github.event.inputs.PR_number }},
+  #           owner: context.repo.owner,
+  #           repo: context.repo.repo,
+  #           body: output
+  #         })
     
-    - name: Terraform Plan Status
-      if: ${{ steps.plan.outcome == 'failure' }}
-      run: exit 1 
+  #   - name: Terraform Plan Status
+  #     if: ${{ steps.plan.outcome == 'failure' }}
+  #     run: exit 1 
 
-    - name: Terraform Apply
-      id: apply
-      working-directory: ${{ github.workspace }}/npm-infra/staging
-      run: |
-        terraform apply --var-file=terraform.tfvars.auto.example -auto-approve -no-color
+  #   - name: Terraform Apply
+  #     id: apply
+  #     working-directory: ${{ github.workspace }}/npm-infra/staging
+  #     run: |
+  #       terraform apply --var-file=terraform.tfvars.auto.example -auto-approve -no-color
         
-    - name: Terraform Output
-      id: apply_output  
-      working-directory: ${{ github.workspace }}/npm-infra/staging
-      run: | 
-        OUTPUT=$(terraform output -raw -no-color ${{ steps.create_stage_resource_file.outputs.STAGING_RESOURCE_NAME }})
-        echo "TF_APPLY_OUTPUT=$OUTPUT" >> $GITHUB_OUTPUT
+  #   - name: Terraform Output
+  #     id: apply_output  
+  #     working-directory: ${{ github.workspace }}/npm-infra/staging
+  #     run: | 
+  #       OUTPUT=$(terraform output -raw -no-color ${{ steps.create_stage_resource_file.outputs.STAGING_RESOURCE_NAME }})
+  #       echo "TF_APPLY_OUTPUT=$OUTPUT" >> $GITHUB_OUTPUT
 
-    - name: Echo outputs
-      run: |
-        echo "STAGING_RESOURCE_NAME: ${{ steps.create_stage_resource_file.outputs.STAGING_RESOURCE_NAME }}"
-        echo "TF_APPLY_OUTPUT: ${{ steps.apply.outputs.TF_APPLY_OUTPUT }}"
-        echo "PR_REF: ${{ steps.verify_pr.outputs.PR_REF }}"
+  #   - name: Echo outputs
+  #     run: |
+  #       echo "STAGING_RESOURCE_NAME: ${{ steps.create_stage_resource_file.outputs.STAGING_RESOURCE_NAME }}"
+  #       echo "TF_APPLY_OUTPUT: ${{ steps.apply.outputs.TF_APPLY_OUTPUT }}"
+  #       echo "PR_REF: ${{ steps.verify_pr.outputs.PR_REF }}"
       
-    - name: Commit terraform resource files
-      working-directory: ${{ github.workspace }}/npm-infra/staging
-      run: |
-        # git config --global user.name '${{ github.actor }}'
-        # git config --global user.email '${{ github.actor}}@users.noreply.github.com'
-        # git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-        # git add ./*.tf
-        # git commit -m "Add terraform resource files" && \
-        #   git push || echo "Nothing to commit"
+  #   - name: Commit terraform resource files
+  #     working-directory: ${{ github.workspace }}/npm-infra/staging
+  #     run: |
+  #       # git config --global user.name '${{ github.actor }}'
+  #       # git config --global user.email '${{ github.actor}}@users.noreply.github.com'
+  #       # git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+  #       # git add ./*.tf
+  #       # git commit -m "Add terraform resource files" && \
+  #       #   git push || echo "Nothing to commit"
         
-        git config --global user.name "bLACKZU"
-        git config --global user.email "satyakighosh65@gmail.com"
-        git remote set-url origin https://x-access-token:${{ secrets.NPM_INFRA_TOKEN }}@github.com/bLACKZU/npm-infra.git
-        git add ./*.tf
-        git commit -m "Add terraform resource files" && \
-          git push || echo "Nothing to commit"
+  #       git config --global user.name "bLACKZU"
+  #       git config --global user.email "satyakighosh65@gmail.com"
+  #       git remote set-url origin https://x-access-token:${{ secrets.NPM_INFRA_TOKEN }}@github.com/bLACKZU/npm-infra.git
+  #       git add ./*.tf
+  #       git commit -m "Add terraform resource files" && \
+  #         git push || echo "Nothing to commit"
 
-  deploy-staging:
-    needs: create
-    uses: bLACKZU/npm-ci-cd-actions/.github/workflows/called-deploy.yaml@main
-    with:
-      PR_number: ${{ needs.create.outputs.PR_REF }}
-      src_path: ./web
-      remote_path: /var/app/web
-      remote_host: ${{ needs.create.outputs.TF_APPLY_OUTPUT }}
-      remote_user: ubuntu
-    secrets:
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+  # deploy-staging:
+  #   needs: create
+  #   uses: bLACKZU/npm-ci-cd-actions/.github/workflows/called-deploy.yaml@main
+  #   with:
+  #     PR_number: ${{ needs.create.outputs.PR_REF }}
+  #     src_path: ./web
+  #     remote_path: /var/app/web
+  #     remote_host: ${{ needs.create.outputs.TF_APPLY_OUTPUT }}
+  #     remote_user: ubuntu
+  #   secrets:
+  #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
-  log-deploy-output:
-    needs: deploy-staging
-    runs-on: ubuntu-latest
-    steps:
-      - name: Log remote host
-        run: | 
-          echo "Remote host: ${{ needs.create.outputs.TF_APPLY_OUTPUT }}"
+  # log-deploy-output:
+  #   needs: deploy-staging
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Log remote host
+  #       run: | 
+  #         echo "Remote host: ${{ needs.create.outputs.TF_APPLY_OUTPUT }}"
         
 
   
