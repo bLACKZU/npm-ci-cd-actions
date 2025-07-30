@@ -39,6 +39,7 @@ jobs:
           echo "Remote Path: ${{ inputs.remote_path }}"
           echo "Remote Host: ${{ inputs.remote_host }}"
           echo "Remote User: ${{ inputs.remote_user }}"
+          pwd
           
       - name: Checkout PR branch
         uses: actions/checkout@v4
