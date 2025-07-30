@@ -49,12 +49,15 @@ jobs:
       - name: Sync files to staging server
         uses: burnett01/rsync-deployments@23a557dceb19f9bb960ef40cf75cab5e9b37ec1f
         with:
-          switches: -avzr --delete
+          switches: -avzr --delete --log-file=rsync.log
           path: ${{ inputs.src_path }}
           remote_path: ${{ inputs.remote_path }}
           remote_host: ${{ inputs.remote_host }}
           remote_user: ${{ inputs.remote_user }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Show rsync log
+        run: cat rsync.log
 
       - name: Execute SSH commmands on remote server
         uses: JimCronqvist/action-ssh@7737f1192ddd8376686e9d6354dea44592c942bf
@@ -62,6 +65,8 @@ jobs:
           hosts: '${{ inputs.remote_user }}@${{ inputs.remote_host }}'
           privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
           command: |
+            sudo mkdir -p /var/app
+            sudo chown -R ubuntu:ubuntu /var/app
             cd /var/app/web
             npm ci
             pm2 start /var/app/web/bin/www || pm2 restart /var/app/web/bin/www
