@@ -74,34 +74,17 @@ jobs:
           hosts: '${{ inputs.remote_user }}@${{ inputs.remote_host }}'
           privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
           command: |
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
-            export PATH="$NVM_DIR/versions/node/$(nvm version)/bin:$PATH"
-
+            sudo apt update
+            sudo apt install nodejs npm -y
+            node -v
+            npm -v
+            sudo npm install -g pm2
+            sudo apt install nginx -y
             cd /var/app/web
-
-            echo "Installing dependencies..."
-            if ! command -v npm > /dev/null; then
-              echo "npm not found. Is Node.js installed via nvm?"
-              exit 1
-            fi
             npm ci
-
-            echo "Starting PM2 process..."
-            if ! command -v pm2 > /dev/null; then
-              echo "pm2 not found. Run 'npm install -g pm2' or expose it in PATH"
-              exit 1
-            fi
-            pm2 start bin/www || pm2 restart bin/www
-
-            echo "Restarting nginx..."
-            if systemctl list-units --type=service | grep -q nginx; then
-              sudo systemctl restart nginx
-            else
-              echo "nginx service not found. Is nginx installed?"
-              exit 1
-            fi
-
+            pm2 start /var/app/web/bin/www || pm2 restart /var/app/web/bin/www
+            sudo service nginx restart
+            
       - name: Update status
         uses: actions/github-script@v5
         with:
