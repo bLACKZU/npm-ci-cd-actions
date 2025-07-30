@@ -151,6 +151,7 @@ jobs:
         git config --global user.name "bLACKZU"
         git config --global user.email "satyakighosh65@gmail.com"
         git remote set-url origin https://x-access-token:${{ secrets.NPM_INFRA_TOKEN }}@github.com/bLACKZU/npm-infra.git
+        git pull --rebase origin main || echo "Nothing to rebase"
         git add ./*.tf
         git commit -m "Add terraform resource files" && \
           git push || echo "Nothing to commit"
