@@ -72,6 +72,7 @@ jobs:
         current=$(pwd)
         chmod +x $current/npm-infra/staging/create_staging_resource.sh
         OUTPUT="$($current/npm-infra/staging/create_staging_resource.sh PR_${{ inputs.PR_number }} | jq -r .terraform_expected_output)"
+        echo $OUTPUT
         echo "STAGING_RESOURCE_NAME=$OUTPUT" >> $GITHUB_OUTPUT
 
     - name: Terraform Init & Validate
