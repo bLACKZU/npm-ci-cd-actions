@@ -72,73 +72,73 @@ jobs:
         jq --version
         current=$(pwd)
         chmod +x $current/npm-infra/staging/create_staging_resource.sh
-        $current/npm-infra/staging/create_staging_resource.sh PR_${{ inputs.PR_number }} 
-         $current/npm-infra/staging/create_staging_resource.sh PR_${{ inputs.PR_number }} | jq
-        # echo "STAGING_RESOURCE_NAME=$OUTPUT" >> $GITHUB_OUTPUT
+        OUTPUT=$($current/npm-infra/staging/create_staging_resource.sh PR_${{ inputs.PR_number }} | jq -r '.terraform_expected_output')
+        echo "STAGING_RESOURCE_NAME=$OUTPUT" >> $GITHUB_OUTPUT
 
-  #   - name: Terraform Init & Validate
-  #     id: init
-  #     working-directory: ${{ github.workspace }}/npm-infra/staging
-  #     run: |
-  #       terraform init
-  #       terraform validate -no-color
+    - name: Terraform Init & Validate
+      id: init
+      working-directory: ${{ github.workspace }}/npm-infra/staging
+      run: |
+        terraform init
+        terraform validate -no-color
 
-  #   - name: Configure AWS Credentials 
-  #     uses: aws-actions/configure-aws-credentials@v4.1.0
-  #     with:
-  #       aws-region: us-east-1
-  #       role-to-assume: ${{ secrets.AWS_STAGING_ROLE_ARN }}
+    - name: Configure AWS Credentials 
+      uses: aws-actions/configure-aws-credentials@v4.1.0
+      with:
+        aws-region: us-east-1
+        role-to-assume: ${{ secrets.AWS_STAGING_ROLE_ARN }}
 
-  #   - name: Terraform Plan
-  #     id: plan
-  #     working-directory: ${{ github.workspace }}/npm-infra/staging
-  #     run: |
-  #       terraform plan --var-file=terraform.tfvars.auto.example -no-color
-  #     continue-on-error: true
+    - name: Terraform Plan
+      id: plan
+      working-directory: ${{ github.workspace }}/npm-infra/staging
+      run: |
+        terraform plan --var-file=terraform.tfvars.auto.example -no-color
+      continue-on-error: true
     
-  #   - name: Update Pull Request
-  #     uses: actions/github-script@v7
-  #     env:
-  #       PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
-  #     with:
-  #       github-token: ${{ secrets.GITHUB_TOKEN }}
-  #       script: |
-  #         const output = `#### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-  #         #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+    - name: Update Pull Request
+      uses: actions/github-script@v7
+      env:
+        PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const output = `#### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+          #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
 
-  #         <details><summary>Show Plan</summary>
+          <details><summary>Show Plan</summary>
 
-  #         \`\`\`\n
-  #         ${process.env.PLAN}
-  #         \`\`\`
+          \`\`\`\n
+          ${process.env.PLAN}
+          \`\`\`
 
-  #         </details>
+          </details>
 
-  #         *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+          *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
 
-  #         github.rest.issues.createComment({
-  #           issue_number: ${{ github.event.inputs.PR_number }},
-  #           owner: context.repo.owner,
-  #           repo: context.repo.repo,
-  #           body: output
-  #         })
+          github.rest.issues.createComment({
+            issue_number: ${{ github.event.inputs.PR_number }},
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: output
+          })
     
-  #   - name: Terraform Plan Status
-  #     if: ${{ steps.plan.outcome == 'failure' }}
-  #     run: exit 1 
+    - name: Terraform Plan Status
+      if: ${{ steps.plan.outcome == 'failure' }}
+      run: exit 1 
 
-  #   - name: Terraform Apply
-  #     id: apply
-  #     working-directory: ${{ github.workspace }}/npm-infra/staging
-  #     run: |
-  #       terraform apply --var-file=terraform.tfvars.auto.example -auto-approve -no-color
+    - name: Terraform Apply
+      id: apply
+      working-directory: ${{ github.workspace }}/npm-infra/staging
+      run: |
+        terraform apply --var-file=terraform.tfvars.auto.example -auto-approve -no-color
         
-  #   - name: Terraform Output
-  #     id: apply_output  
-  #     working-directory: ${{ github.workspace }}/npm-infra/staging
-  #     run: | 
-  #       OUTPUT=$(terraform output -raw -no-color ${{ steps.create_stage_resource_file.outputs.STAGING_RESOURCE_NAME }})
-  #       echo "TF_APPLY_OUTPUT=$OUTPUT" >> $GITHUB_OUTPUT
+    - name: Terraform Output
+      id: apply_output  
+      working-directory: ${{ github.workspace }}/npm-infra/staging
+      run: | 
+        terraform output
+        OUTPUT=$(terraform output -raw -no-color ${{ steps.create_stage_resource_file.outputs.STAGING_RESOURCE_NAME }})
+        echo "TF_APPLY_OUTPUT=$OUTPUT" >> $GITHUB_OUTPUT
 
   #   - name: Echo outputs
   #     run: |
