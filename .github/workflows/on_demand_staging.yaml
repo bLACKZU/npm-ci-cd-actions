@@ -169,7 +169,7 @@ jobs:
     with:
       PR_number: ${{ needs.create.outputs.PR_REF }}
       src_path: ./web
-      remote_path: /var/app/web
+      remote_path: /var/app
       remote_host: ${{ needs.create.outputs.TF_APPLY_OUTPUT }}
       remote_user: ubuntu
     secrets:
