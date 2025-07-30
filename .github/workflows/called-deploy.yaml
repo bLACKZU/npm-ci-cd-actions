@@ -32,6 +32,14 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Echo inputs
+        run: |
+          echo "PR Number: ${{ inputs.PR_number }}"
+          echo "Source Path: ${{ inputs.src_path }}"
+          echo "Remote Path: ${{ inputs.remote_path }}"
+          echo "Remote Host: ${{ inputs.remote_host }}"
+          echo "Remote User: ${{ inputs.remote_user }}"
+          
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
