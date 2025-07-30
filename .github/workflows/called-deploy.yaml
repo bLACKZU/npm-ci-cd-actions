@@ -37,14 +37,14 @@ jobs:
         with:
           ref: ${{ inputs.PR_number }}
 
-      - name: Deploy to staging
+      - name: Sync files to staging server
         uses: burnett01/rsync-deployments@23a557dceb19f9bb960ef40cf75cab5e9b37ec1f
         with:
           switches: -avzr --delete
           path: ${{ inputs.src_path }}
           remote_path: ${{ inputs.remote_path }}
           remote_host: ${{ inputs.remote_host }}
-          remote_user: ${{ secrets.REMOTE_USER }}
+          remote_user: ${{ inputs.remote_user }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Execute SSH commmands on remote server
