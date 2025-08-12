@@ -82,7 +82,20 @@ jobs:
             sudo apt install nginx -y
             cd /var/app/web
             npm ci
+            ls -l
             pm2 start /var/app/web/bin/www || pm2 restart /var/app/web/bin/www
+            sudo tee /etc/nginx/sites-available/default > /dev/null <<EOF
+            server {
+                listen 80;
+                server_name _;
+
+                location / {
+                    proxy_pass http://localhost:3000;
+                    proxy_set_header Host \$host;
+                    proxy_set_header X-Real-IP \$remote_addr;
+                }
+            }
+            EOF
             sudo service nginx restart
             
       - name: Update status

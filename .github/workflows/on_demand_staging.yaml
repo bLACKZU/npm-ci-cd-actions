@@ -174,14 +174,6 @@ jobs:
       remote_user: ubuntu
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-
-  log-deploy-output:
-    needs: deploy-staging
-    runs-on: ubuntu-latest
-    steps:
-      - name: Log remote host
-        run: | 
-          echo "Remote host: ${{ needs.create.outputs.TF_APPLY_OUTPUT }}"
         
 
   
