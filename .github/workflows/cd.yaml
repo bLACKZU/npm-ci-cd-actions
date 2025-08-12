@@ -9,7 +9,6 @@ on:
 
 jobs:
     deploy_staging:
-      environment: staging
       uses: bLACKZU/npm-ci-cd-actions/.github/workflows/called-deploy.yaml@main
       with:
           PR_number: main
