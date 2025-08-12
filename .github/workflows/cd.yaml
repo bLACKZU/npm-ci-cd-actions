@@ -17,7 +17,6 @@ defaults:
 jobs:
     deploy_staging:
       environment: staging
-      name: 'Deploy to staging'
       uses: bLACKZU/npm-ci-cd-actions/.github/workflows/called-deploy.yaml@main
       with:
           PR_number: main
