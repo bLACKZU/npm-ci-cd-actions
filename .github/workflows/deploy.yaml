@@ -7,17 +7,20 @@ on:
       - 'main'
   workflow_dispatch:
 
+
 jobs:
-    deploy_staging:
-      uses: bLACKZU/npm-ci-cd-actions/.github/workflows/called-deploy.yaml@main
-      with:
-          PR_number: main
-          src_path: ./web
-          remote_path: /var/app
-          remote_host: ${{ vars.STAGING_HOST }}
-          remote_user: ubuntu
-      secrets:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+  deploy_staging:
+    environment: staging
+    uses: bLACKZU/npm-ci-cd-actions/.github/workflows/called-deploy.yaml@main
+    with:
+      PR_number: main
+      src_path: ./web
+      remote_path: /var/app
+      remote_host: ${{ vars.STAGING_HOST }}
+      remote_user: ubuntu
+    secrets:
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
     
     # deploy_production:
     #     environment: production
