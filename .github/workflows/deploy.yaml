@@ -9,7 +9,7 @@ on:
 
 
 jobs:
-  deploy_staging:
+  deploy_fixed_staging:
     environment: staging
     uses: bLACKZU/npm-ci-cd-actions/.github/workflows/called-deploy.yaml@main
     with:
