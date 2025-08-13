@@ -2,10 +2,10 @@ name: Continuous Deployment Workflow
 
 # This workflow is triggered whenever commits are pushed to the main branch
 on:
+  workflow_dispatch:
   push:
     branches:
       - 'main'
-  workflow_dispatch:
 
 permissions:
   contents: read
