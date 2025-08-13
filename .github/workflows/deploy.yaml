@@ -9,8 +9,18 @@ on:
 
 permissions:
   contents: read
-  
+
 jobs:
+  create:
+    name: dummy
+    defaults:
+      run:
+        shell: bash
+    runs-on: ubuntu-latest
+    steps:
+      - name: List files
+        run: ls -la
+  
   deploy_fixed_staging:
     environment: staging
     uses: bLACKZU/npm-ci-cd-actions/.github/workflows/called-deploy.yaml@main
