@@ -12,8 +12,6 @@ permissions:
 jobs:
 
   deploy_fixed_staging:
-    name: Deploy to fixed Staging
-    environment: staging
     uses: bLACKZU/npm-ci-cd-actions/.github/workflows/called-deploy.yaml@main
     with:
       PR_number: main
