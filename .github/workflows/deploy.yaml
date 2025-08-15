@@ -21,6 +21,7 @@ jobs:
       remote_user: ubuntu
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+    name: staging-zz
 
     # deploy_production:
     #     environment: production
