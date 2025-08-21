@@ -13,7 +13,6 @@ jobs:
 
   deploy_fixed_staging:
     name: Deploy to fixed Staging
-    environment: staging
     uses: bLACKZU/npm-ci-cd-actions/.github/workflows/called-deploy.yaml@main
     with:
       PR_number: main
@@ -24,16 +23,15 @@ jobs:
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    # deploy_production:
-    #     environment: production
-    #     name: 'Gated deployment to production'
-    #     needs: deploy_staging
-    #     uses: bLACKZU/npm-ci-cd-actions/.github/workflows/called-deploy.yaml@main
-    #     with:
-    #       PR_number: main
-    #       src_path: ./web
-    #       remote_path: /var/app
-    #       remote_host: ${{ vars.PRODUCTION_HOST }}
-    #       remote_user: ubuntu
-    #     secrets:
-    #       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+  deploy_production:
+    name: 'Gated deployment to production'
+    needs: deploy_fixed_staging
+    uses: bLACKZU/npm-ci-cd-actions/.github/workflows/called-deploy.yaml@main
+    with:
+      PR_number: main
+      src_path: ./web
+      remote_path: /var/app
+      remote_host: ${{ vars.PRODUCTION_HOST }}
+      remote_user: ubuntu
+    secrets:
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
