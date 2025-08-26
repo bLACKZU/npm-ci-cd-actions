@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.0](https://github.com/bLACKZU/npm-ci-cd-actions/compare/v0.1.0...v1.0.0) (2025-08-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* minor change
+
+### Features
+
+* minor change ([b60afc7](https://github.com/bLACKZU/npm-ci-cd-actions/commit/b60afc7da0b4f851b88158764dd8fd2dfa18f124))
+
 ## 0.1.0 (2025-08-26)
 
 
